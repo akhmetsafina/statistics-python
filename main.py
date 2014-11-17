@@ -115,6 +115,9 @@ def SmirnovStatistic(x, y):
     someSqrt = math.sqrt(len(x) * len(y) * 1. / (len(x) + len(y)))
     return smirnovD * someSqrt
 
+def oneSidedSmirnovSignificancyLevel(x, y):
+    return math.exp(-2 * oneSidedSmirnovStatistic(x, y))
+
 def MannWhitney(x, y):
     cnt = 0
     for i in x:
@@ -132,11 +135,21 @@ def MannWhitneyVariance(x, y):
 def MannWhitneyStatistic(x, y):
     return (MannWhitney(x, y) - MannWhitneyExpectation(x, y)) * 1. / math.sqrt(MannWhitneyVariance(x, y))
 
-col = 15
+#len(x) must be greater than 1.
+def correctedSampleVariance(x):
+    return sampleVariance(x) * 1.  * len(x) / (len(x) - 1)
+
+def totalSampleVariance(x, y):
+    return (sampleVariance(x) * len(x) + sampleVariance(y) * len(y)) * 1. / (len(x) + len(y) - 2)
+
+def StudentStatistic(x, y):
+    return math.sqrt(len(x) * len(y) * 1. / (len(x) + len(y))) * (sampleMoment(y, 1) - sampleMoment(x, 1)) * 1. / totalSampleVariance(x, y)
+
+col = 2
 sampleSize = 100
 
 c = getColumnWithNumber(col, sampleSize)
-c = simulateWithReversedFunction(lambda x: math.sqrt(x), c)
+c = simulateWithReversedFunction(lambda x: math.log(1. / (1 - x + 0.2)), c)
 
 #print kolmogorovStatistic(c)
 #print omegaSquareStatistic(c)
@@ -146,12 +159,11 @@ c = simulateWithReversedFunction(lambda x: math.sqrt(x), c)
 
 
 a = getColumnWithNumber(1, sampleSize)
+a = simulateWithReversedFunction(lambda x: math.log(1. / (1 - x)), a)
 #c = getColumnWithNumber(col - 1, sampleSize)
 b = list(map(lambda x, y, z: max(x, y, z), getColumnWithNumber(col + 1, sampleSize), getColumnWithNumber(col + 2, sampleSize), getColumnWithNumber(col + 3, sampleSize)))
 
 
 
-print SmirnovStatistic(a, b)
-print SmirnovStatistic(a, c)
-print MannWhitneyStatistic(a, b)
-print oneSidedSmirnovStatistic(a, c)
+print StudentStatistic(a, c)
+print MannWhitneyStatistic(a, c)
