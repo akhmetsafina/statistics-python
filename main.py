@@ -13,6 +13,20 @@ def sampleCentralMoment(b, k):
 def sampleVariance(b):
     return sampleMoment(b, 2) - (sampleMoment(b, 1) ** 2)
 
+def mediana(b):
+    if (len(b) == 1):
+        return b[len(b) / 2]
+    else:
+        return (b[len(b) / 2] + b[len(b) / 2 - 1]) * 1. / 2
+
+def Walsch(b):
+    a = []
+    for i in xrange(len(b) * (len(b) + 1) / 2):
+        for j in xrange(len(b)):
+            for k in xrange(j + 1):
+                a[i] = 1. / 2 * (b[j] + b[k])
+    return mediana(a);
+
 def assymetry(b):
     return sampleCentralMoment(b, 3) / (sampleCentralMoment(b, 2) ** 1.5)
 
@@ -65,6 +79,12 @@ def omegaSquareStatistic(c):
     for i in xrange(n):
         ans += (b[i] - (2. * (i + 1) - 1.) / (2. * n)) ** 2
     return ans
+
+def OrlovStatistic(b):
+    sum = 0
+    for i in xrange(len(b)):
+        sum += (1 - empericDistributionFunction(b, b[i]) - empericDistributionFunction(b, -b[i])) ** 2
+    return sum
 
 def assymetryStatistic(b):
     return assymetryPrime(b) / math.sqrt(varianceOfAssymetryPrime(b))
@@ -148,8 +168,8 @@ def StudentStatistic(x, y):
 col = 2
 sampleSize = 100
 
-c = getColumnWithNumber(col, sampleSize)
-c = simulateWithReversedFunction(lambda x: math.log(1. / (1 - x + 0.2)), c)
+#c = getColumnWithNumber(col, sampleSize)
+#c = simulateWithReversedFunction(lambda x: math.log(1. / (1 - x + 0.2)), c)
 
 #print kolmogorovStatistic(c)
 #print omegaSquareStatistic(c)
@@ -158,12 +178,13 @@ c = simulateWithReversedFunction(lambda x: math.log(1. / (1 - x + 0.2)), c)
 #print GiriStarStatistic(c)
 
 
-a = getColumnWithNumber(1, sampleSize)
-a = simulateWithReversedFunction(lambda x: math.log(1. / (1 - x)), a)
+a = getColumnWithNumber(col, sampleSize)
+a = simulateWithReversedFunction(lambda x: math.log((1 - x) * 1. / x), a)
 #c = getColumnWithNumber(col - 1, sampleSize)
 b = list(map(lambda x, y, z: max(x, y, z), getColumnWithNumber(col + 1, sampleSize), getColumnWithNumber(col + 2, sampleSize), getColumnWithNumber(col + 3, sampleSize)))
 
 
-
-print StudentStatistic(a, c)
-print MannWhitneyStatistic(a, c)
+print sampleMoment(a, 1)
+print mediana(a)
+#print Walsch(a)
+print OrlovStatistic(a)
