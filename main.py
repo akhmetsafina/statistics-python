@@ -13,19 +13,16 @@ def sampleCentralMoment(b, k):
 def sampleVariance(b):
     return sampleMoment(b, 2) - (sampleMoment(b, 1) ** 2)
 
-def mediana(b):
-    if (len(b) == 1):
-        return b[len(b) / 2]
+def median(b):
+    z = sorted(b)
+    if (len(z) % 2 == 1):
+        return z[len(z) / 2]
     else:
-        return (b[len(b) / 2] + b[len(b) / 2 - 1]) * 1. / 2
+        return (z[len(z) / 2] + z[len(z) / 2 - 1]) * 1. / 2
 
-def Walsch(b):
-    a = []
-    for i in xrange(len(b) * (len(b) + 1) / 2):
-        for j in xrange(len(b)):
-            for k in xrange(j + 1):
-                a[i] = 1. / 2 * (b[j] + b[k])
-    return mediana(a);
+def WalshMedian(b):
+    a = [(b[i] + b[j]) * 1. / 2 for i in xrange(len(b)) for j in xrange(i, len(b))]
+    return median(a);
 
 def assymetry(b):
     return sampleCentralMoment(b, 3) / (sampleCentralMoment(b, 2) ** 1.5)
@@ -80,10 +77,19 @@ def omegaSquareStatistic(c):
         ans += (b[i] - (2. * (i + 1) - 1.) / (2. * n)) ** 2
     return ans
 
+# for \theta = 0.5
+def signsStatistic(b):
+    return sum([1 for i in b if i > 0.5])
+
+# for \theta = 0.5 (suggested by Willcockson).
+def signRanksStatistic(b):
+    z = sorted(b, key = lambda x: abs(x - 0.5))
+    return sum([(i + 1) for i in xrange(len(z)) if z[i] > 0.5])
+
 def OrlovStatistic(b):
     sum = 0
     for i in xrange(len(b)):
-        sum += (1 - empericDistributionFunction(b, b[i]) - empericDistributionFunction(b, -b[i])) ** 2
+        sum += ((1 - empericDistributionFunction(b, b[i]) - empericDistributionFunction(b, -b[i])) ** 2)
     return sum
 
 def assymetryStatistic(b):
@@ -185,6 +191,6 @@ b = list(map(lambda x, y, z: max(x, y, z), getColumnWithNumber(col + 1, sampleSi
 
 
 print sampleMoment(a, 1)
-print mediana(a)
+print median(a)
 #print Walsch(a)
 print OrlovStatistic(a)
