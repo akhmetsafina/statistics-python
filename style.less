@@ -1,0 +1,22 @@
+@import "bootstrap-3.3.1/less/bootstrap.less";
+
+@background-yellow: #FCDE00;
+
+.jumbotron {
+  @media (min-width: @screen-md) {
+    background-image: url("newjumbo.png");
+    background-repeat: no-repeat;
+  }
+  background-color: @background-yellow;
+  background-position: right;
+  font-family: 'Arvo';
+}
+
+.jumbotron .container {
+  color: #0B0902;
+}
+
+.btn {
+  //.button-variant(@btn-primary-color; @btn-primary-bg; @btn-primary-border);
+  .button-variant(@background-yellow; #0B0902; transparent);
+}
