@@ -79,12 +79,13 @@ def omegaSquareStatistic(c):
 
 # for \theta = 0.5
 def signsStatistic(b):
-    return sum([1 for i in b if i > 0.5])
+    return (sum([1 for i in b if i > 0.5]) - len(b) * 1. / 2) / math.sqrt(len(b) * 1. / 4)
 
 # for \theta = 0.5 (suggested by Willcockson).
 def signRanksStatistic(b):
     z = sorted(b, key = lambda x: abs(x - 0.5))
-    return sum([(i + 1) for i in xrange(len(z)) if z[i] > 0.5])
+    t = sum([(i + 1) for i in xrange(len(z)) if z[i] > 0.5])
+    return (t - (len(b) * (len(b) + 1) * 1. / 4)) / math.sqrt(len(b) * (len(b) + 1) * (2 * len(b) + 1) * 1. / 24)
 
 def OrlovStatistic(b):
     sum = 0
@@ -171,26 +172,10 @@ def totalSampleVariance(x, y):
 def StudentStatistic(x, y):
     return math.sqrt(len(x) * len(y) * 1. / (len(x) + len(y))) * (sampleMoment(y, 1) - sampleMoment(x, 1)) * 1. / totalSampleVariance(x, y)
 
-col = 2
+col = 15
 sampleSize = 100
 
-#c = getColumnWithNumber(col, sampleSize)
-#c = simulateWithReversedFunction(lambda x: math.log(1. / (1 - x + 0.2)), c)
+c = getColumnWithNumber(col, sampleSize)
+c = simulateWithReversedFunction(lambda x: math.log(x * 1. / (1 - x)), c)
 
-#print kolmogorovStatistic(c)
-#print omegaSquareStatistic(c)
-#print sampleCentralMoment([1, 2, 3], 2)
-#print assymetryStatistic(c)
-#print GiriStarStatistic(c)
-
-
-a = getColumnWithNumber(col, sampleSize)
-a = simulateWithReversedFunction(lambda x: math.log((1 - x) * 1. / x), a)
-#c = getColumnWithNumber(col - 1, sampleSize)
-b = list(map(lambda x, y, z: max(x, y, z), getColumnWithNumber(col + 1, sampleSize), getColumnWithNumber(col + 2, sampleSize), getColumnWithNumber(col + 3, sampleSize)))
-
-
-print sampleMoment(a, 1)
-print median(a)
-#print Walsch(a)
-print OrlovStatistic(a)
+print OrlovStatistic(c)
