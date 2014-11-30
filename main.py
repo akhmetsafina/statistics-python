@@ -172,10 +172,36 @@ def totalSampleVariance(x, y):
 def StudentStatistic(x, y):
     return math.sqrt(len(x) * len(y) * 1. / (len(x) + len(y))) * (sampleMoment(y, 1) - sampleMoment(x, 1)) * 1. / totalSampleVariance(x, y)
 
+def chiSquareStatisticUniformIsHomogenious(x, y, N):
+    chiSquare = 0
+    for j in xrange(N):
+        temp = generalFrequencyOfHitsInGapsUniform(x, y, N, j)
+        chiSquare += ((numberOfHitsInGapsUniform(x, N, j) - len(x) * temp) ** 2) * 1. / (len(x) * temp)
+        chiSquare += ((numberOfHitsInGapsUniform(y, N, j) - len(y) * temp) ** 2) * 1. / (len(y) * temp)
+    return chiSquare
+
+def chiSquareStatisticIsUniform(x, N):
+    chiSquare = 0
+    for j in xrange(N):
+        temp = numberOfHitsInGapsUniform(x, N, j)
+        chiSquare += ((temp - (len(x) * 1. / N)) ** 2) * 1. / (len(x) * 1. / N)
+    return chiSquare
+
+def numberOfHitsInGapsUniform(x, N, j):
+    num = 0
+    for i in xrange(len(x)):
+        if ((x[i] > j * 1. / N) and (x[i] <= (j + 1) * 1. / N)):
+            num += 1
+    return num
+
+def generalFrequencyOfHitsInGapsUniform(x, y, N, j):
+    return (numberOfHitsInGapsUniform(x, N, j) + numberOfHitsInGapsUniform(y, N, j)) / (len(x) * 1. + len(y) * 1.)
+
 col = 15
 sampleSize = 100
 
-c = getColumnWithNumber(col, sampleSize)
-c = simulateWithReversedFunction(lambda x: math.log(x * 1. / (1 - x)), c)
+x = getColumnWithNumber(col, sampleSize)
+y = getColumnWithNumber(35, sampleSize)
 
-print OrlovStatistic(c)
+print chiSquareStatisticUniformIsHomogenious(x, y, 7)
+print chiSquareStatisticIsUniform(x, 7)
